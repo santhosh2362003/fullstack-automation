@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # 1. Database - MongoDB image-a direct-ah cloud-la irunthu edukkum
+  db:
+    image: mongo:latest
+    container_name: mongodb_prod
+    ports:
+      - "27017:27017"
+    networks:
+      - fullstack-network
+
+  # 2. Backend - Neenga ezhuthuna 'backend' folder-a build pannum
+  backend:
+    build: ./backend
+    container_name: backend_app
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_URL=mongodb://db:27017/jenkins_task
+    depends_on:
+      - db
+    networks:
+      - fullstack-network
+
+  # 3. Frontend - Neenga ezhuthuna 'frontend' folder-a build pannum
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - fullstack-network
+
+networks:
+  fullstack-network:
+    driver: bridge
